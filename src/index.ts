@@ -11,7 +11,7 @@ let WATERMARK_RATIO = 0
 
 const getWatermarkImage = async () => {
 	if (!WATERMARK_IMAGE) {
-		const logoResp = await env.ASSETS.fetch('http://localhost/watermark.png')
+		const logoResp = await env.ASSETS.fetch('http://asset.local/watermark.png')
 		WATERMARK_IMAGE = PhotonImage.new_from_byteslice(await logoResp.bytes())
 		WATERMARK_WIDTH = WATERMARK_IMAGE.get_width()
 		WATERMARK_HEIGHT = WATERMARK_IMAGE.get_height()
@@ -37,7 +37,7 @@ export default {
 			});
 		}
 
-		const cacheKey = `http://image.localhost/${objectKey}`
+		const cacheKey = `http://image.local/${objectKey}`
 		const cache = caches.default
 	
 		let cachedResp = await cache.match(cacheKey, { ignoreMethod: true })
@@ -70,7 +70,7 @@ export default {
 			watermarkImage = resize(
 				watermarkImage,
 				Math.trunc(watermarkWidth), Math.trunc(watermarkHeight),
-				4
+				5
 			)
 		} else {
 			watermarkHeight = WATERMARK_HEIGHT
@@ -80,7 +80,7 @@ export default {
 		watermark(
 			image, watermarkImage, 
 			BigInt(Math.trunc(imageWidth - watermarkWidth - 10)),
-			BigInt(Math.trunc(imageHeight - watermarkHeight - 20)),
+			BigInt(Math.trunc(imageHeight - watermarkHeight - 10)),
 		)
 		
 		const finalResponse = new Response(image.get_bytes_webp(), {
