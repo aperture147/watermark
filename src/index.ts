@@ -62,26 +62,29 @@ export default {
 		const imageWidth = image.get_width()
 		const imageHeight = image.get_height()
 		
-		let watermarkImage = await getWatermarkImage(url.hostname)
+		const sourceWatermarkImage = await getWatermarkImage(url.hostname)
 		let watermarkWidth = imageWidth * 0.4
 		const newWatermarkRatio = watermarkWidth / WATERMARK_WIDTH
 		let watermarkHeight = newWatermarkRatio * WATERMARK_HEIGHT
 		if (newWatermarkRatio < 0.9 || newWatermarkRatio > 1.1) {
-			watermarkImage = resize(
-				watermarkImage,
+			const watermarkImage = resize(
+				sourceWatermarkImage,
 				Math.trunc(watermarkWidth), Math.trunc(watermarkHeight),
 				5
 			)
+			watermark(
+				image, watermarkImage, 
+				BigInt(imageWidth - watermarkImage.get_width()),
+				BigInt(imageHeight - watermarkImage.get_height()),
+			)
+			watermarkImage.free()
 		} else {
-			watermarkHeight = WATERMARK_HEIGHT
-			watermarkWidth = WATERMARK_WIDTH
+			watermark(
+				image, sourceWatermarkImage, 
+				BigInt(imageWidth - WATERMARK_WIDTH),
+				BigInt(imageHeight - WATERMARK_HEIGHT),
+			)
 		}
-		
-		watermark(
-			image, watermarkImage, 
-			BigInt(imageWidth - watermarkImage.get_width()),
-			BigInt(imageHeight - watermarkImage.get_height()),
-		)
 		
 		const finalResponse = new Response(image.get_bytes_webp(), {
 			headers: {
@@ -89,10 +92,8 @@ export default {
 				'Cache-Control': CACHE_CONTROL_VALUE,
 			},
 		})
-		ctx.waitUntil(new Promise(async () => {
-			await cache.put(cacheKey, finalResponse.clone())
-			image.free()
-		}))
+		image.free()
+		ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()))
 		return finalResponse;
 	},
 } satisfies ExportedHandler<Env>;
