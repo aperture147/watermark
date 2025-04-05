@@ -40,7 +40,7 @@ export default {
 		const cacheKey = `http://image.local/${objectKey}?version=${env.CACHE_VERSION}}`
 		const cache = caches.default
 	
-		let cachedResp = await cache.match(cacheKey, { ignoreMethod: true })
+		const cachedResp = await cache.match(cacheKey, { ignoreMethod: true })
 		if (cachedResp && cachedResp.ok) return cachedResp;
 
 		const imageObject = await env.R2_IMAGES.get(objectKey)
