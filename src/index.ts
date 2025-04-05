@@ -39,7 +39,7 @@ export default {
 
 		const cacheKey = `http://localhost/${objectKey}`
 		const cache = caches.default
-
+	
 		let cachedResp = await cache.match(cacheKey, { ignoreMethod: true })
 		if (cachedResp && cachedResp.ok) return cachedResp;
 
@@ -63,12 +63,15 @@ export default {
 		const imageHeight = image.get_height()
 
 		let watermarkImage = await getWatermarkImage()
-		let watermarkWidth = imageHeight * 0.3
-		let watermarkHeight = WATERMARK_RATIO * watermarkWidth
-		const newWatermarkWidthRatio = watermarkWidth / WATERMARK_WIDTH
-		
-		if (newWatermarkWidthRatio < 0.9 || newWatermarkWidthRatio > 1.1) {
-			watermarkImage = resize(watermarkImage, watermarkWidth, watermarkHeight, 1)
+		let watermarkWidth = imageWidth * 0.4
+		const newWatermarkRatio = watermarkWidth / WATERMARK_WIDTH
+		let watermarkHeight = newWatermarkRatio * WATERMARK_HEIGHT
+		if (newWatermarkRatio < 0.9 || newWatermarkRatio > 1.1) {
+			watermarkImage = resize(
+				watermarkImage,
+				Math.trunc(watermarkWidth), Math.trunc(watermarkHeight),
+				4
+			)
 		} else {
 			watermarkHeight = WATERMARK_HEIGHT
 			watermarkWidth = WATERMARK_WIDTH
@@ -76,8 +79,8 @@ export default {
 		
 		watermark(
 			image, watermarkImage, 
-			BigInt(Math.trunc(imageWidth - watermarkWidth)),
-			BigInt(Math.trunc(imageHeight - watermarkHeight)),
+			BigInt(Math.trunc(imageWidth - watermarkWidth - 10)),
+			BigInt(Math.trunc(imageHeight - watermarkHeight - 10)),
 		)
 		
 		const finalResponse = new Response(image.get_bytes_webp(), {
