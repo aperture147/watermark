@@ -37,7 +37,7 @@ export default {
 			});
 		}
 
-		const cacheKey = `http://image.local/${objectKey}`
+		const cacheKey = `http://image.local/${objectKey}?v=${env.CACHE_VERSION}}`
 		const cache = caches.default
 	
 		let cachedResp = await cache.match(cacheKey, { ignoreMethod: true })
@@ -79,8 +79,8 @@ export default {
 		
 		watermark(
 			image, watermarkImage, 
-			BigInt(Math.trunc(imageWidth - watermarkWidth - 10)),
-			BigInt(Math.trunc(imageHeight - watermarkHeight - 10)),
+			BigInt(Math.trunc(imageWidth - watermarkWidth)),
+			BigInt(Math.trunc(imageHeight - watermarkHeight)),
 		)
 		
 		const finalResponse = new Response(image.get_bytes_webp(), {
