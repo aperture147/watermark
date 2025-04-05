@@ -9,9 +9,9 @@ let WATERMARK_WIDTH = 0
 let WATERMARK_HEIGHT = 0
 let WATERMARK_RATIO = 0
 
-const getWatermarkImage = async () => {
+const getWatermarkImage = async (watermarkKey: string = 'watermark') => {
 	if (!WATERMARK_IMAGE) {
-		const logoResp = await env.ASSETS.fetch('http://asset.local/watermark.png')
+		const logoResp = await env.ASSETS.fetch(`http://asset.local/${watermarkKey}.png`)
 		WATERMARK_IMAGE = PhotonImage.new_from_byteslice(await logoResp.bytes())
 		WATERMARK_WIDTH = WATERMARK_IMAGE.get_width()
 		WATERMARK_HEIGHT = WATERMARK_IMAGE.get_height()
@@ -61,8 +61,8 @@ export default {
 		const image = PhotonImage.new_from_byteslice(new Uint8Array(await imageObject.arrayBuffer()))
 		const imageWidth = image.get_width()
 		const imageHeight = image.get_height()
-
-		let watermarkImage = await getWatermarkImage()
+		
+		let watermarkImage = await getWatermarkImage(url.hostname)
 		let watermarkWidth = imageWidth * 0.4
 		const newWatermarkRatio = watermarkWidth / WATERMARK_WIDTH
 		let watermarkHeight = newWatermarkRatio * WATERMARK_HEIGHT
