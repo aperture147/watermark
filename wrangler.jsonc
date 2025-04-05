@@ -17,7 +17,7 @@
 	"workers_dev": false,
 	"routes": [
 		{
-			"pattern": "image2.cgtraderfree.com",
+			"pattern": "image.cgtraderfree.com",
 			"custom_domain": true,
 		}
 	],
