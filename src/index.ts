@@ -1,6 +1,6 @@
 import { PhotonImage, watermark, resize } from "@cf-wasm/photon";
 import { env } from "cloudflare:workers";
-import { FAVICON_SET, ROBOTS_TXT } from "./constant"
+import { CACHE_CONTROL_VALUE, FAVICON_SET, ROBOTS_TXT } from "./constant"
 
 const TRIMMING_SLASH_REGEX = /^\/+|\/+$/g;
 
@@ -47,11 +47,11 @@ export default {
 		if (!imageObject) {
 			return new Response('Not found', { status: 404 });
 		}
-
+		
 		if (FAVICON_SET.has(objectKey)) {
 			const resp = new Response(imageObject.body, {
 				headers: {		
-					'Cache-Control': 'public, max-age=31536000, s-maxage=31536000'
+					'Cache-Control': CACHE_CONTROL_VALUE
 				}
 			})
 			ctx.waitUntil(cache.put(cacheKey, resp.clone()))
@@ -83,7 +83,7 @@ export default {
 		const finalResponse = new Response(image.get_bytes_webp(), {
 			headers: {
 				'Content-Type': 'image/webp',
-				'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
+				'Cache-Control': CACHE_CONTROL_VALUE,
 			},
 		})
 		ctx.waitUntil(new Promise(async () => {

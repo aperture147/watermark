@@ -52,3 +52,5 @@ export const FAVICON_SET = new Set([
 	'favicon.ico',
 	'site.webmanifest'
 ])
+
+export const CACHE_CONTROL_VALUE = 'public, max-age=31536000, s-maxage=31536000'
