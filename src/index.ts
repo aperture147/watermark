@@ -80,7 +80,7 @@ export default {
 		watermark(
 			image, watermarkImage, 
 			BigInt(Math.trunc(imageWidth - watermarkWidth - 10)),
-			BigInt(Math.trunc(imageHeight - watermarkHeight - 10)),
+			BigInt(Math.trunc(imageHeight - watermarkHeight - 20)),
 		)
 		
 		const finalResponse = new Response(image.get_bytes_webp(), {
