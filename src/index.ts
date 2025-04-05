@@ -37,7 +37,7 @@ export default {
 			});
 		}
 
-		const cacheKey = `http://image.local/${objectKey}?v=${env.CACHE_VERSION}}`
+		const cacheKey = `http://image.local/${objectKey}?version=${env.CACHE_VERSION}}`
 		const cache = caches.default
 	
 		let cachedResp = await cache.match(cacheKey, { ignoreMethod: true })
