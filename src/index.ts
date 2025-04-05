@@ -37,7 +37,7 @@ export default {
 			});
 		}
 
-		const cacheKey = `http://localhost/${objectKey}`
+		const cacheKey = `http://image.localhost/${objectKey}`
 		const cache = caches.default
 	
 		let cachedResp = await cache.match(cacheKey, { ignoreMethod: true })
