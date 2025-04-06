@@ -11,6 +11,9 @@
 		"binding": "ASSETS",
 		"directory": "./public"
 	},
+	"limits": {
+		"cpu_ms": 500
+	},
 	"observability": {
 		"enabled": true
 	},
