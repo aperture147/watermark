@@ -72,10 +72,16 @@ export default {
 				Math.trunc(watermarkWidth), Math.trunc(watermarkHeight),
 				5
 			)
+			let offsetX = imageWidth - watermarkImage.get_width()
+			let offsetY = imageHeight - watermarkImage.get_height()
+
+			if (imageWidth > imageHeight) {
+				offsetX -= Math.trunc((imageWidth - imageHeight) / 2)
+			}
 			watermark(
 				image, watermarkImage, 
-				BigInt(imageWidth - watermarkImage.get_width()),
-				BigInt(imageHeight - watermarkImage.get_height()),
+				BigInt(offsetX),
+				BigInt(offsetY),
 			)
 			watermarkImage.free()
 		} else {
