@@ -61,23 +61,25 @@ export default {
 		const image = PhotonImage.new_from_byteslice(new Uint8Array(await imageObject.arrayBuffer()))
 		const imageWidth = image.get_width()
 		const imageHeight = image.get_height()
-		
 		const sourceWatermarkImage = await getWatermarkImage(url.hostname)
-		let watermarkWidth = imageWidth * 0.4
+		let referenceWidth = imageWidth > imageHeight ? imageHeight : imageWidth
+		let offOffsetX = 0
+		if (imageWidth > imageHeight) {
+			referenceWidth = imageHeight
+			offOffsetX = Math.trunc((imageWidth - imageHeight) / 2)
+		}
+		let watermarkWidth = Math.trunc(referenceWidth * 0.4)
 		const newWatermarkRatio = watermarkWidth / WATERMARK_WIDTH
-		let watermarkHeight = newWatermarkRatio * WATERMARK_HEIGHT
+		let watermarkHeight = Math.trunc(newWatermarkRatio * WATERMARK_HEIGHT)
 		if (newWatermarkRatio < 0.9 || newWatermarkRatio > 1.1) {
 			const watermarkImage = resize(
 				sourceWatermarkImage,
-				Math.trunc(watermarkWidth), Math.trunc(watermarkHeight),
+				watermarkWidth, watermarkHeight,
 				5
 			)
-			let offsetX = imageWidth - watermarkImage.get_width()
+			let offsetX = imageWidth - watermarkImage.get_width() - offOffsetX
 			let offsetY = imageHeight - watermarkImage.get_height()
 
-			if (imageWidth > imageHeight) {
-				offsetX -= Math.trunc((imageWidth - imageHeight) / 2)
-			}
 			watermark(
 				image, watermarkImage, 
 				BigInt(offsetX),
@@ -85,11 +87,9 @@ export default {
 			)
 			watermarkImage.free()
 		} else {
-			let offsetX = imageWidth - WATERMARK_WIDTH
+			let offsetX = imageWidth - WATERMARK_WIDTH - offOffsetX
 			let offsetY = imageHeight - WATERMARK_HEIGHT
-			if (imageWidth > imageHeight) {
-				offsetX -= Math.trunc((imageWidth - imageHeight) / 2)
-			}
+			
 			watermark(
 				image, sourceWatermarkImage, 
 				BigInt(offsetX),
