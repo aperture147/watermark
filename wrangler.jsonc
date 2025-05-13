@@ -18,14 +18,15 @@
 		"enabled": true
 	},
 	"workers_dev": false,
+	"preview_urls": false,
 	"routes": [
 		{
-			"pattern": "image.cgtraderfree.com",
+			"pattern": "image.3dmaxter.com",
 			"custom_domain": true,
 		}
 	],
 	"vars": {
-		"CACHE_VERSION": "3"
+		"CACHE_VERSION": "4"
 	},
 	/**
 	 * Smart Placement
