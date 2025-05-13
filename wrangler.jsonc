@@ -37,7 +37,7 @@
 	"r2_buckets": [
 		{
 			"binding": "R2_IMAGES",
-			"bucket_name": "cgtraderfree"
+			"bucket_name": "image-storage"
 		}
 	],
 
