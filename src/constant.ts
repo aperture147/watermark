@@ -54,3 +54,7 @@ export const FAVICON_SET = new Set([
 ])
 
 export const CACHE_CONTROL_VALUE = 'public, max-age=31536000, s-maxage=31536000'
+
+export const TRIMMING_SLASH_REGEX = /^\/+|\/+$/g;
+
+export const ONE_MEBIBYTES = 1024 * 1024

@@ -1,8 +1,6 @@
 import { PhotonImage, watermark, resize } from "@cf-wasm/photon";
 import { env } from "cloudflare:workers";
-import { CACHE_CONTROL_VALUE, FAVICON_SET, ROBOTS_TXT } from "./constant"
-
-const TRIMMING_SLASH_REGEX = /^\/+|\/+$/g;
+import { CACHE_CONTROL_VALUE, FAVICON_SET, ONE_MEBIBYTES, ROBOTS_TXT, TRIMMING_SLASH_REGEX } from "./constant"
 
 let WATERMARK_IMAGE: PhotonImage | null = null
 let WATERMARK_WIDTH = 0
@@ -46,6 +44,18 @@ export default {
 		const imageObject = await env.R2_IMAGES.get(objectKey)
 		if (!imageObject) {
 			return new Response('Not found', { status: 404 });
+		}
+		
+		if (imageObject.size > 7 * ONE_MEBIBYTES) {
+			const resp = new Response(imageObject.body, {
+				headers: {
+					'Content-Type': imageObject.httpMetadata?.contentType ?? 'image/jpeg',
+					'Cache-Control': CACHE_CONTROL_VALUE,
+				},
+			})
+
+			ctx.waitUntil(cache.put(cacheKey, resp.clone()))
+			return resp
 		}
 		
 		if (FAVICON_SET.has(objectKey)) {
