@@ -12,7 +12,7 @@
 		"directory": "./public"
 	},
 	"limits": {
-		"cpu_ms": 500
+		"cpu_ms": 750
 	},
 	"observability": {
 		"enabled": true
