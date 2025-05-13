@@ -46,7 +46,17 @@ export default {
 			return new Response('Not found', { status: 404 });
 		}
 		
-		if (imageObject.size > 7 * ONE_MEBIBYTES) {
+		if (FAVICON_SET.has(objectKey)) {
+			const resp = new Response(imageObject.body, {
+				headers: {		
+					'Cache-Control': CACHE_CONTROL_VALUE
+				}
+			})
+			ctx.waitUntil(cache.put(cacheKey, resp.clone()))
+			return resp
+		}
+
+		if (imageObject.size >= 7 * ONE_MEBIBYTES) {
 			const resp = new Response(imageObject.body, {
 				headers: {
 					'Content-Type': imageObject.httpMetadata?.contentType ?? 'image/jpeg',
@@ -54,16 +64,6 @@ export default {
 				},
 			})
 
-			ctx.waitUntil(cache.put(cacheKey, resp.clone()))
-			return resp
-		}
-		
-		if (FAVICON_SET.has(objectKey)) {
-			const resp = new Response(imageObject.body, {
-				headers: {		
-					'Cache-Control': CACHE_CONTROL_VALUE
-				}
-			})
 			ctx.waitUntil(cache.put(cacheKey, resp.clone()))
 			return resp
 		}
@@ -107,9 +107,9 @@ export default {
 			)
 		}
 		
-		const finalResponse = new Response(image.get_bytes_webp(), {
+		const finalResponse = new Response(image.get_bytes_jpeg(70), {
 			headers: {
-				'Content-Type': 'image/webp',
+				'Content-Type': 'image/jpeg',
 				'Cache-Control': CACHE_CONTROL_VALUE,
 			},
 		})
