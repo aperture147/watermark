@@ -56,7 +56,7 @@ export default {
 			return resp
 		}
 
-		if (imageObject.size >= 7 * ONE_MEBIBYTES) {
+		if (imageObject.size > 5 * ONE_MEBIBYTES) {
 			const resp = new Response(imageObject.body, {
 				headers: {
 					'Content-Type': imageObject.httpMetadata?.contentType ?? 'image/jpeg',
