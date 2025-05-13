@@ -26,7 +26,7 @@
 		}
 	],
 	"vars": {
-		"CACHE_VERSION": "4"
+		"CACHE_VERSION": "15"
 	},
 	/**
 	 * Smart Placement
