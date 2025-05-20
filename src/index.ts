@@ -67,54 +67,66 @@ export default {
 			ctx.waitUntil(cache.put(cacheKey, resp.clone()))
 			return resp
 		}
-
-		const image = PhotonImage.new_from_byteslice(new Uint8Array(await imageObject.arrayBuffer()))
-		const imageWidth = image.get_width()
-		const imageHeight = image.get_height()
-		const sourceWatermarkImage = await getWatermarkImage(url.hostname)
-		let referenceWidth = imageWidth > imageHeight ? imageHeight : imageWidth
-		let offOffsetX = 0
-		if (imageWidth > imageHeight) {
-			referenceWidth = imageHeight
-			offOffsetX = Math.trunc((imageWidth - imageHeight) / 2)
-		}
-		let watermarkWidth = Math.trunc(referenceWidth * 0.4)
-		const newWatermarkRatio = watermarkWidth / WATERMARK_WIDTH
-		let watermarkHeight = Math.trunc(newWatermarkRatio * WATERMARK_HEIGHT)
-		if (newWatermarkRatio < 0.9 || newWatermarkRatio > 1.1) {
-			const watermarkImage = resize(
-				sourceWatermarkImage,
-				watermarkWidth, watermarkHeight,
-				5
-			)
-			let offsetX = imageWidth - watermarkImage.get_width() - offOffsetX
-			let offsetY = imageHeight - watermarkImage.get_height()
-
-			watermark(
-				image, watermarkImage, 
-				BigInt(offsetX),
-				BigInt(offsetY),
-			)
-			watermarkImage.free()
-		} else {
-			let offsetX = imageWidth - WATERMARK_WIDTH - offOffsetX
-			let offsetY = imageHeight - WATERMARK_HEIGHT
-			
-			watermark(
-				image, sourceWatermarkImage, 
-				BigInt(offsetX),
-				BigInt(offsetY),
-			)
-		}
 		
-		const finalResponse = new Response(image.get_bytes_jpeg(70), {
-			headers: {
-				'Content-Type': 'image/jpeg',
-				'Cache-Control': CACHE_CONTROL_VALUE,
-			},
-		})
-		image.free()
-		ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()))
-		return finalResponse;
+		try {
+			const image = PhotonImage.new_from_byteslice(new Uint8Array(await imageObject.arrayBuffer()))
+			const imageWidth = image.get_width()
+			const imageHeight = image.get_height()
+			const sourceWatermarkImage = await getWatermarkImage(url.hostname)
+			let referenceWidth = imageWidth > imageHeight ? imageHeight : imageWidth
+			let offOffsetX = 0
+			if (imageWidth > imageHeight) {
+				referenceWidth = imageHeight
+				offOffsetX = Math.trunc((imageWidth - imageHeight) / 2)
+			}
+			let watermarkWidth = Math.trunc(referenceWidth * 0.4)
+			const newWatermarkRatio = watermarkWidth / WATERMARK_WIDTH
+			let watermarkHeight = Math.trunc(newWatermarkRatio * WATERMARK_HEIGHT)
+			if (newWatermarkRatio < 0.9 || newWatermarkRatio > 1.1) {
+				const watermarkImage = resize(
+					sourceWatermarkImage,
+					watermarkWidth, watermarkHeight,
+					5
+				)
+				let offsetX = imageWidth - watermarkImage.get_width() - offOffsetX
+				let offsetY = imageHeight - watermarkImage.get_height()
+
+				watermark(
+					image, watermarkImage, 
+					BigInt(offsetX),
+					BigInt(offsetY),
+				)
+				watermarkImage.free()
+			} else {
+				let offsetX = imageWidth - WATERMARK_WIDTH - offOffsetX
+				let offsetY = imageHeight - WATERMARK_HEIGHT
+				
+				watermark(
+					image, sourceWatermarkImage, 
+					BigInt(offsetX),
+					BigInt(offsetY),
+				)
+			}
+			
+			const finalResponse = new Response(image.get_bytes_jpeg(70), {
+				headers: {
+					'Content-Type': 'image/jpeg',
+					'Cache-Control': CACHE_CONTROL_VALUE,
+				},
+			})
+			image.free()
+
+			ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()))
+
+			return finalResponse;
+		} catch (e) {
+			if (!(e instanceof WebAssembly.RuntimeError)) {
+				throw e
+			}
+			if (e.message.includes('unreachable')) {
+				return new Response('Failed to process the image, please contact administators to resolve this problem', { status: 500 });
+			}
+		}
+		return new Response('Unexpected error', { status: 504 });
 	},
 } satisfies ExportedHandler<Env>;
